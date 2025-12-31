@@ -4,6 +4,8 @@ import { webcrypto } from "node:crypto";
 import { MeshesApiError } from "../src/lib/errors";
 import MeshesApiClient from "../src";
 
+const jwtInstances: any[] = [];
+
 vi.mock("jose", () => {
   class SignJWT {
     payload: any;
@@ -15,6 +17,7 @@ vi.mock("jose", () => {
 
     constructor(payload: any) {
       this.payload = payload;
+      jwtInstances.push(this);
     }
     setProtectedHeader(h: any) {
       this.protectedHeader = h;
@@ -729,5 +732,207 @@ describe("MeshesApiClient (management api)", () => {
     const [, init] = (globalThis.fetch as any).mock.calls[0];
     expect(init.headers["X-Request-Id"]).toBe("req_ok");
     expect(init.headers["X-Not-String"]).toBeUndefined();
+  });
+
+  it("GET calls fetch with correct url + init (full contract)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: '{"ok":true}' })
+    );
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY,
+      VALID_SECRET_KEY
+    );
+
+    await client.get("accounts", {
+      query: { a: 1, b: true, c: "x" },
+      headers: { "X-Request-Id": "req_1" } as any,
+    });
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (globalThis.fetch as any).mock.calls[0];
+
+    expect(url).toBe("https://api.meshes.io/api/v1/accounts?a=1&b=true&c=x");
+
+    expect(init).toEqual(
+      expect.objectContaining({
+        method: "GET",
+        body: null,
+      })
+    );
+
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer test.jwt.token",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Meshes-Client": expect.stringMatching(/^Meshes API Client/),
+        "X-Request-Id": "req_1",
+      })
+    );
+
+    if (globalThis.AbortController) {
+      expect(init.signal).toBeDefined();
+    }
+  });
+
+  it("POST calls fetch with correct url + init (full contract)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: '{"ok":true}' })
+    );
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY,
+      VALID_SECRET_KEY
+    );
+
+    await client.post(
+      "/things",
+      { a: 1 },
+      { headers: { "X-Request-Id": "req_2" } as any }
+    );
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (globalThis.fetch as any).mock.calls[0];
+
+    expect(url).toBe("https://api.meshes.io/api/v1/things");
+    expect(init.method).toBe("POST");
+    expect(init.body).toBe(JSON.stringify({ a: 1 }));
+
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer test.jwt.token",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Meshes-Client": expect.any(String),
+        "X-Request-Id": "req_2",
+      })
+    );
+
+    if (globalThis.AbortController) {
+      expect(init.signal).toBeDefined();
+    }
+  });
+
+  it("PUT calls fetch with correct url + init (full contract, raw string body)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: '{"ok":true}' })
+    );
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY,
+      VALID_SECRET_KEY
+    );
+
+    await client.put("things/1", "RAW", { query: { mode: "overwrite" } });
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (globalThis.fetch as any).mock.calls[0];
+
+    expect(url).toBe("https://api.meshes.io/api/v1/things/1?mode=overwrite");
+    expect(init.method).toBe("PUT");
+    expect(init.body).toBe("RAW");
+
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer test.jwt.token",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Meshes-Client": expect.any(String),
+      })
+    );
+  });
+
+  it("PATCH calls fetch with correct url + init (full contract)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: '{"ok":true}' })
+    );
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY,
+      VALID_SECRET_KEY
+    );
+
+    await client.patch("/things/1", { b: 2 });
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (globalThis.fetch as any).mock.calls[0];
+
+    expect(url).toBe("https://api.meshes.io/api/v1/things/1");
+    expect(init.method).toBe("PATCH");
+    expect(init.body).toBe(JSON.stringify({ b: 2 }));
+
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer test.jwt.token",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Meshes-Client": expect.any(String),
+      })
+    );
+  });
+
+  it("DELETE calls fetch with correct url + init (full contract)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: '{"ok":true}' })
+    );
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY,
+      VALID_SECRET_KEY
+    );
+
+    await client.delete("things/1", { query: { hard: true } });
+
+    expect(globalThis.fetch).toHaveBeenCalledTimes(1);
+    const [url, init] = (globalThis.fetch as any).mock.calls[0];
+
+    expect(url).toBe("https://api.meshes.io/api/v1/things/1?hard=true");
+    expect(init.method).toBe("DELETE");
+    expect(init.body).toBeNull();
+
+    expect(init.headers).toEqual(
+      expect.objectContaining({
+        Authorization: "Bearer test.jwt.token",
+        Accept: "application/json",
+        "Content-Type": "application/json",
+        "X-Meshes-Client": expect.any(String),
+      })
+    );
+  });
+
+  it("builds the JWT with correct claims/header (mocked jose)", async () => {
+    (globalThis.fetch as any).mockResolvedValue(
+      mockResponse({ ok: true, bodyText: "{}" })
+    );
+
+    const VALID_ACCESS_KEY_2 = "mk_" + "d".repeat(22);
+    const VALID_SECRET_KEY_2 = "e".repeat(43);
+
+    const client = new MeshesApiClient(
+      VALID_ORG_ID,
+      VALID_ACCESS_KEY_2,
+      VALID_SECRET_KEY_2
+    );
+    await client.get("/x");
+
+    expect(jwtInstances.length).toBeGreaterThan(0);
+    const jwt = jwtInstances[jwtInstances.length - 1];
+
+    expect(jwt.payload).toEqual({ org: VALID_ORG_ID });
+    expect(jwt.protectedHeader).toEqual({
+      alg: "HS256",
+      typ: "JWT",
+      kid: VALID_ACCESS_KEY_2,
+    });
+    expect(jwt.issuer).toBe(`urn:meshes:m2m:${VALID_ACCESS_KEY_2}`);
+    expect(jwt.audience).toBe("meshes-api");
+    expect(jwt.issuedAt).toBe(true);
+    expect(jwt.expiration).toBe("30s");
   });
 });
