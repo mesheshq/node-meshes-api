@@ -14,6 +14,8 @@ This package is designed to be tiny and predictable:
 - Allows safe custom headers (with contract headers protected)
 - Optional timeout support using `AbortController` when available
 
+See the [API Docs](https://meshes.io/docs) for more details about the API methods.
+
 ---
 
 ## Installation
@@ -301,7 +303,7 @@ Node 18+ already includes WebCrypto globally.
 
 MIT
 
-[npm-install-size-image]: https://badgen.net/packagephobia/publish/@mesheshq/api?cache=250&v1.0.0
+[npm-install-size-image]: https://badgen.net/packagephobia/publish/@mesheshq/api?cache=250&v1.0.1
 [npm-install-size-url]: https://packagephobia.com/result?p=%40mesheshq%2Fapi
 [npm-url]: https://www.npmjs.com/package/@mesheshq/api
-[npm-version-image]: https://badgen.net/npm/v/@mesheshq/api?cache=250&v1.0.0
+[npm-version-image]: https://badgen.net/npm/v/@mesheshq/api?cache=250&v1.0.1
