@@ -1,6 +1,6 @@
 {
   "name": "@mesheshq/api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Meshes API client for management APIs.",
   "author": "Todd Schlomer <todd@meshes.io> (https://meshes.io)",
   "license": "MIT",
