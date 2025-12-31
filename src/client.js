@@ -23,7 +23,19 @@ import { SignJWT } from "jose";
 
 const MAX_TIMEOUT_MS = 30000;
 
-const forbiddenHeaders = new Set(["x-meshes-client", "content-type", "accept"]);
+const forbiddenHeaders = new Set([
+  "accept",
+  "authorization",
+  "content-length",
+  "content-type",
+  "host",
+  "x-amz-date",
+  "x-api-key",
+  "x-amz-security-token",
+  "x-amz-user-agent",
+  "x-meshes-client",
+  "x-meshes-publishable-key",
+]);
 
 /**
  * Valid HTTP methods
@@ -66,9 +78,10 @@ export class MeshesApiClient {
    */
   constructor(organizationId, accessKey, secretKey, options = {}) {
     const regex = {
-      organizationId: /^(?![-])[a-z0-9-]+(?<![-])$/gm,
-      accessKey: /^[a-zA-Z0-9]+$/,
-      secretKey: /^[a-zA-Z0-9_=\-\/]+$/,
+      organizationId:
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+      accessKey: /^mk_[A-Za-z0-9_-]+$/,
+      secretKey: /^[A-Za-z0-9_-]{43,}$/,
     };
 
     if (
@@ -206,31 +219,6 @@ export class MeshesApiClient {
     return request;
   }
 
-  // /**
-  //  * Validate the event object
-  //  * @param {MeshesEventBody} event
-  //  */
-  // #validateEvent(event) {
-  //   if (!event || typeof event !== "object") {
-  //     throw new MeshesApiError("Invalid event: must be an object", event);
-  //   }
-  //   if (typeof event.event !== "string" || !event.event.trim()) {
-  //     throw new MeshesApiError("Invalid event: missing 'event' string", event);
-  //   }
-  //   if (!event.payload || typeof event.payload !== "object") {
-  //     throw new MeshesApiError(
-  //       "Invalid event: missing 'payload' object",
-  //       event
-  //     );
-  //   }
-  //   if (
-  //     typeof event.payload.email !== "string" ||
-  //     !event.payload.email.trim()
-  //   ) {
-  //     throw new MeshesApiError("Invalid event: missing payload.email", event);
-  //   }
-  // }
-
   /**
    * Clean the input headers
    * @param {Headers | undefined} headers - Request headers
@@ -284,7 +272,7 @@ export class MeshesApiClient {
       this.#log("AbortController", "Not Supported; Timeouts won't be enforced");
     }
 
-    const requestPromise = new Promise(async (resolve, reject) => {
+    const requestPromise = new Promise((resolve, reject) => {
       if (typeof options !== "object") {
         this.#log("Invalid Request Options", options);
         throw new MeshesApiError("Invalid request options", options);
@@ -342,7 +330,16 @@ export class MeshesApiClient {
             ).toString()}`
           : "";
 
-        const requestOptions = await this.#includeApiJwt({
+        const requestPath =
+          options.path.charAt(0) !== "/" ? `/${options.path}` : options.path;
+
+        this.#log("Fetch Options", {
+          method: method,
+          path: requestPath,
+          query: queryString,
+        });
+
+        return this.#includeApiJwt({
           method: method,
           headers: {
             ...this.#cleanHeaders(options.headers),
@@ -354,20 +351,13 @@ export class MeshesApiClient {
               : JSON.stringify(options.body)
             : null,
           signal: controller?.signal,
-        });
-
-        const requestPath =
-          options.path.charAt(0) !== "/" ? `/${options.path}` : options.path;
-
-        this.#log("Fetch Options", {
-          method: requestOptions.method,
-          path: requestPath,
-          query: queryString,
-        });
-        return fetch(
-          `${this.#apiBaseUrl}${requestPath}${queryString}`,
-          requestOptions
-        )
+        })
+          .then((requestOptions) => {
+            return fetch(
+              `${this.#apiBaseUrl}${requestPath}${queryString}`,
+              requestOptions
+            );
+          })
           .then((response) => {
             if (response.ok) {
               readBody(response)

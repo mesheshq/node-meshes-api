@@ -1,32 +1,14 @@
 /**
- * Typescript type definitions for Meshes Events API
- * @module meshes-events-client
+ * Typescript type definitions for Meshes API Client
+ * @module meshes-api
  * @license MIT
  * @since 1.0.0
  * @description Meshes API client for management APIs.
- * @repository https://github.com/mesheshq/node-meshes-events-client
+ * @repository https://github.com/mesheshq/node-meshes-api
  */
-export type MeshesEvent = {
-    type: "event";
-    event: string;
-    id: string;
-    workspace: string;
-    created_by: string;
-    created_at: string;
-    resource: string;
-    resource_id?: string;
-};
 export type MeshesErrorResponse = {
     message: string;
     error?: unknown;
-};
-export type CreateEventResponseSingle = {
-    event: MeshesEvent;
-};
-export type BulkCreateEventsResult = {
-    count: number;
-    records: (MeshesEvent | MeshesErrorResponse)[];
-    error_count?: number;
 };
 /**
  * Callback function to use rather than promises
@@ -108,68 +90,59 @@ export type MeshesRequestOptions = {
     timeout?: number;
 };
 /**
- * Meshes event payload structure.
- */
-export type MeshesEventPayload = {
-    /**
-     * The payload email.  This is required.
-     */
-    email: string;
-    first_name?: string;
-    id?: string;
-    ip_address?: string;
-    last_name?: string;
-    name?: string;
-    phone?: string;
-    resource_url?: string;
-} & {
-    [k: string]: unknown;
-};
-/**
- * Meshes event structure.
- */
-export type MeshesEventBody = {
-    /**
-     * The event type for the event.
-     */
-    event: string;
-    /**
-     * The custom resource.  Defaults to 'global'.
-     */
-    resource?: string;
-    /**
-     * The resource ID for a custom resource.
-     */
-    resource_id?: string;
-    /**
-     * The event payload that will be used.
-     */
-    payload: MeshesEventPayload;
-};
-/**
- * Meshes Events API Client
+ * Meshes API Client
  * @class
- * @property {Function} emit - Create (emit) a single event
- * @property {Function} emitBatch - Create (emit) multiple events up to 100 at a time
+ * @property {Function} get - Send a GET request to the Meshes API
+ * @property {Function} post - Send a POST request to the Meshes API
+ * @property {Function} put - Send a PUT request to the Meshes API
+ * @property {Function} patch - Send a PATCH request to the Meshes API
+ * @property {Function} delete - Send a DELETE request to the Meshes API
  */
-export declare class MeshesEventsClient {
-    constructor(publishableKey: string, options?: MeshesOptions);
+export declare class MeshesApiClient {
+    constructor(organizationId: string, accessKey: string, secretKey: string, options?: MeshesOptions);
     /**
-     * Create (emit) a single event
-     * @param {MeshesEventBody} event - The event to emit
-     * @param {MeshesOptionalRequestOptions} options - Optional request options
-     * @param {CallbackFunction<CreateEventResponseSingle>} done - Optional callback function
-     * @returns {Promise<CreateEventResponseSingle> | undefined} - Request promise or undefined if a callback is provided
+     * Send a GET request to the Meshes API
+     * @param {string} path - Request path
+     * @param {MeshesOptionalRequestOptions} options - Request options
+     * @param {CallbackFunction} done - Callback function
+     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
      */
-    emit(event: MeshesEventBody, options?: MeshesOptionalRequestOptions, done?: CallbackFunction<CreateEventResponseSingle>): Promise<CreateEventResponseSingle> | undefined;
+    get(path: string, options?: MeshesOptionalRequestOptions, done?: CallbackFunction): Promise<unknown> | undefined;
     /**
-     * Create (emit) multiple events up to 100 at a time
-     * @param {MeshesEventBody[]} events - The events to emit
-     * @param {MeshesOptionalRequestOptions} options - Optional request options
-     * @param {CallbackFunction<BulkCreateEventsResult>} done - Optional callback function
-     * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+     * Send a POST request to the Meshes API
+     * @param {string} path - Request path
+     * @param {any} body - Request body
+     * @param {MeshesOptionalRequestOptions} options - Request options
+     * @param {CallbackFunction} done - Callback function
+     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
      */
-    emitBatch(events: MeshesEventBody[], options?: MeshesOptionalRequestOptions, done?: CallbackFunction<BulkCreateEventsResult>): Promise<BulkCreateEventsResult> | undefined;
+    post(path: string, body: unknown, options?: MeshesOptionalRequestOptions, done?: CallbackFunction): Promise<unknown> | undefined;
+    /**
+     * Send a PUT request to the Meshes API
+     * @param {string} path - Request path
+     * @param {unknown} body - Request body
+     * @param {MeshesOptionalRequestOptions} options - Request options
+     * @param {CallbackFunction} done - Callback function
+     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     */
+    put(path: string, body: unknown, options?: MeshesOptionalRequestOptions, done?: CallbackFunction): Promise<unknown> | undefined;
+    /**
+     * Send a PATCH request to the Meshes API
+     * @param {string} path - Request path
+     * @param {unknown} body - Request body
+     * @param {MeshesOptionalRequestOptions} options - Request options
+     * @param {CallbackFunction} done - Callback function
+     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     */
+    patch(path: string, body: unknown, options?: MeshesOptionalRequestOptions, done?: CallbackFunction): Promise<unknown> | undefined;
+    /**
+     * Send a DELETE request to the Meshes API
+     * @param {string} path - Request path
+     * @param {MeshesOptionalRequestOptions} options - Request options
+     * @param {CallbackFunction} done - Callback function
+     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     */
+    delete(path: string, options?: MeshesOptionalRequestOptions, done?: CallbackFunction): Promise<unknown> | undefined;
 }
 /**
  * Meshes API Error
@@ -184,5 +157,5 @@ export declare class MeshesApiError extends Error {
         stack?: any;
     };
 }
-declare const _default: typeof MeshesEventsClient;
+declare const _default: typeof MeshesApiClient;
 export default _default;

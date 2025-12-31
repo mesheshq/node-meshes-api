@@ -1,6 +1,6 @@
 /**
  * Typescript type definitions for Meshes API Client
- * @module meshes-events-client
+ * @module meshes-api
  * @license MIT
  * @since 1.0.0
  * @description Meshes API client for management APIs.
