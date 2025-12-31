@@ -276,140 +276,135 @@ export class MeshesApiClient {
     }
 
     const requestPromise = new Promise((resolve, reject) => {
-      try {
-        if (typeof options !== "object") {
-          this.#log("Invalid Request Options", options);
-          throw new MeshesApiError("Invalid request options", options);
-        }
-        const method = /** @type {MeshesApiMethod | undefined} */ (
-          options?.method?.toUpperCase()
-        );
-        if (!method || typeof method !== "string") {
-          this.#log("Invalid Request Method", options);
-          throw new MeshesApiError("Invalid request method", options);
-        } else if (!validMethods.includes(method)) {
-          this.#log("Invalid Request Method Option", options);
-          throw new MeshesApiError("Unsupported request method", options);
-        }
-
-        if (
-          !options?.path ||
-          typeof options.path !== "string" ||
-          options.path.trim().length === 0 ||
-          options.path.trim() === "/"
-        ) {
-          this.#log("Invalid Request Path", options);
-          throw new MeshesApiError("Invalid request path", options);
-        }
-
-        if (typeof options?.timeout !== "undefined") {
-          if (typeof options.timeout !== "number") {
-            this.#log("Invalid Request Timeout", options);
-            throw new MeshesApiError("Invalid request timeout", options);
-          }
-          if (options.timeout < 1000 || options.timeout > MAX_TIMEOUT_MS) {
-            this.#log("Unsupported Request Timeout", options);
-            throw new MeshesApiError("Unsupported request timeout", options);
-          }
-        }
-
-        if (typeof options.query !== "undefined") {
-          if (
-            !options.query ||
-            typeof options.query !== "object" ||
-            Array.isArray(options.query)
-          ) {
-            this.#log("Invalid Request Query Params", options);
-            throw new MeshesApiError("Invalid request query params", options);
-          }
-        }
-
-        const queryString = options.query
-          ? `?${new URLSearchParams(
-              Object.entries(options.query).reduce((acc, [k, v]) => {
-                acc[k] = String(v);
-                return acc;
-              }, /** @type {Record<string, string>} */ ({}))
-            ).toString()}`
-          : "";
-
-        const requestPath =
-          options.path.charAt(0) !== "/" ? `/${options.path}` : options.path;
-
-        this.#log("Fetch Options", {
-          method: method,
-          path: requestPath,
-          query: queryString,
-        });
-
-        return this.#includeApiJwt({
-          method: method,
-          headers: {
-            ...this.#cleanHeaders(options.headers),
-            ...this.#apiHeaders,
-          },
-          body: options.body
-            ? typeof options.body === "string"
-              ? options.body
-              : JSON.stringify(options.body)
-            : null,
-          signal: controller?.signal,
-        })
-          .then((requestOptions) => {
-            return fetch(
-              `${this.#apiBaseUrl}${requestPath}${queryString}`,
-              requestOptions
-            );
-          })
-          .then((response) => {
-            if (response.ok) {
-              readBody(response)
-                .then((data) => {
-                  this.#log("Response Success");
-                  resolve(data);
-                })
-                .catch((err) => {
-                  this.#error("Response Parsing Error", err);
-                  reject(
-                    new MeshesApiError("Error parsing response data", err)
-                  );
-                });
-            } else {
-              readBody(response)
-                .then((data) => {
-                  this.#log("Response Error", data);
-                  reject(
-                    new MeshesApiError("Meshes API request failed", {
-                      status: response.status,
-                      statusText: response.statusText,
-                      data,
-                    })
-                  );
-                })
-                .catch((err) => {
-                  this.#error("Response Parsing Failure", err);
-                  reject(
-                    new MeshesApiError("Error parsing request failure", {
-                      status: response.status,
-                      statusText: response.statusText,
-                      error: err,
-                    })
-                  );
-                });
-            }
-          })
-          .catch((err) => {
-            this.#error("Request Failure", err);
-            reject(new MeshesApiError("Request Failure", err));
-          });
-      } catch (err) {
-        this.#error("Unexpected Error", err);
-        if (err instanceof MeshesApiError) {
-          reject(err);
-          return;
-        }
-        reject(new MeshesApiError("Unexpected Error", err));
+      if (typeof options !== "object") {
+        this.#log("Invalid Request Options", options);
+        return reject(new MeshesApiError("Invalid request options", options));
       }
+      const method = /** @type {MeshesApiMethod | undefined} */ (
+        options?.method?.toUpperCase()
+      );
+      if (!method || typeof method !== "string") {
+        this.#log("Invalid Request Method", options);
+        return reject(new MeshesApiError("Invalid request method", options));
+      } else if (!validMethods.includes(method)) {
+        this.#log("Invalid Request Method Option", options);
+        return reject(
+          new MeshesApiError("Unsupported request method", options)
+        );
+      }
+
+      if (
+        !options?.path ||
+        typeof options.path !== "string" ||
+        options.path.trim().length === 0 ||
+        options.path.trim() === "/"
+      ) {
+        this.#log("Invalid Request Path", options);
+        return reject(new MeshesApiError("Invalid request path", options));
+      }
+
+      if (typeof options?.timeout !== "undefined") {
+        if (typeof options.timeout !== "number") {
+          this.#log("Invalid Request Timeout", options);
+          return reject(new MeshesApiError("Invalid request timeout", options));
+        }
+        if (options.timeout < 1000 || options.timeout > MAX_TIMEOUT_MS) {
+          this.#log("Unsupported Request Timeout", options);
+          return reject(
+            new MeshesApiError("Unsupported request timeout", options)
+          );
+        }
+      }
+
+      if (typeof options.query !== "undefined") {
+        if (
+          !options.query ||
+          typeof options.query !== "object" ||
+          Array.isArray(options.query)
+        ) {
+          this.#log("Invalid Request Query Params", options);
+          return reject(
+            new MeshesApiError("Invalid request query params", options)
+          );
+        }
+      }
+
+      const queryString = options.query
+        ? `?${new URLSearchParams(
+            Object.entries(options.query).reduce((acc, [k, v]) => {
+              acc[k] = String(v);
+              return acc;
+            }, /** @type {Record<string, string>} */ ({}))
+          ).toString()}`
+        : "";
+
+      const requestPath =
+        options.path.charAt(0) !== "/" ? `/${options.path}` : options.path;
+
+      this.#log("Fetch Options", {
+        method: method,
+        path: requestPath,
+        query: queryString,
+      });
+
+      return this.#includeApiJwt({
+        method: method,
+        headers: {
+          ...this.#cleanHeaders(options.headers),
+          ...this.#apiHeaders,
+        },
+        body: options.body
+          ? typeof options.body === "string"
+            ? options.body
+            : JSON.stringify(options.body)
+          : null,
+        signal: controller?.signal,
+      })
+        .then((requestOptions) => {
+          return fetch(
+            `${this.#apiBaseUrl}${requestPath}${queryString}`,
+            requestOptions
+          );
+        })
+        .then((response) => {
+          if (response.ok) {
+            readBody(response)
+              .then((data) => {
+                this.#log("Response Success");
+                resolve(data);
+              })
+              .catch((err) => {
+                this.#error("Response Parsing Error", err);
+                reject(new MeshesApiError("Error parsing response data", err));
+              });
+          } else {
+            readBody(response)
+              .then((data) => {
+                this.#log("Response Error", data);
+                reject(
+                  new MeshesApiError("Meshes API request failed", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data,
+                  })
+                );
+              })
+              .catch((err) => {
+                this.#error("Response Parsing Failure", err);
+                reject(
+                  new MeshesApiError("Error parsing request failure", {
+                    status: response.status,
+                    statusText: response.statusText,
+                    error: err,
+                  })
+                );
+              });
+          }
+        })
+        .catch((err) => {
+          this.#error("Request Failure", err);
+          reject(new MeshesApiError("Request Failure", err));
+        });
     })
       .then((result) => {
         this.#log("Promise Success", result);
