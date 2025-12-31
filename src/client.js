@@ -14,8 +14,6 @@
 /** @typedef {import("./index.js").MeshesApiMethod} MeshesApiMethod */
 /** @typedef {import("./index.js").MeshesRequestOptions} MeshesRequestOptions */
 /** @typedef {import("./index.js").MeshesOptionalRequestOptions} MeshesOptionalRequestOptions */
-/** @typedef {import("./index.js").CallbackFunction} CallbackFunction */
-/** @typedef {import("./index.js").CallbackFunction<any>} CallbackAny */
 /** @typedef {{ method: MeshesApiMethod, headers: Headers, body: string | null, signal?: AbortSignal }} MeshesRequestInit */
 
 import { MeshesApiError } from "./lib/errors.js";
@@ -84,7 +82,7 @@ export class MeshesApiClient {
     const regex = {
       organizationId:
         /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
-      accessKey: /^mk_[A-Za-z0-9_-]+$/,
+      accessKey: /^mk_[A-Za-z0-9_-]{22,}$/,
       secretKey: /^[A-Za-z0-9_-]{43,}$/,
     };
 
