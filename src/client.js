@@ -14,6 +14,7 @@
 /** @typedef {import("./index.js").MeshesApiMethod} MeshesApiMethod */
 /** @typedef {import("./index.js").MeshesRequestOptions} MeshesRequestOptions */
 /** @typedef {import("./index.js").MeshesOptionalRequestOptions} MeshesOptionalRequestOptions */
+/** @typedef {import("./index.js").CallbackFunction} CallbackFunction */
 /** @typedef {import("./index.js").CallbackFunction<any>} CallbackAny */
 /** @typedef {{ method: MeshesApiMethod, headers: Headers, body: string | null, signal?: AbortSignal }} MeshesRequestInit */
 
@@ -251,9 +252,10 @@ export class MeshesApiClient {
 
   /**
    * Make an API request
+   * @template T
    * @param {MeshesRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<any> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   #request(options, done) {
@@ -443,102 +445,120 @@ export class MeshesApiClient {
 
   /**
    * API GET request
+   * @template T
    * @param {string} path - Request path
    * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   get(path, options = {}, done) {
-    return this.#request(
-      {
-        ...options,
-        path: path,
-        method: "GET",
-      },
-      done
+    return /** @type {Promise<T> | undefined} */ (
+      this.#request(
+        {
+          ...options,
+          path: path,
+          method: "GET",
+        },
+        done
+      )
     );
   }
 
   /**
    * API POST request
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {unknown} body - Request body
+   * @param {B} body - Request body
    * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   post(path, body, options = {}, done) {
-    return this.#request(
-      {
-        ...options,
-        path: path,
-        method: "POST",
-        body: body,
-      },
-      done
+    return /** @type {Promise<T> | undefined} */ (
+      this.#request(
+        {
+          ...options,
+          path: path,
+          method: "POST",
+          body: body,
+        },
+        done
+      )
     );
   }
 
   /**
    * API PUT request
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {unknown} body - Request body
+   * @param {B} body - Request body
    * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   put(path, body, options = {}, done) {
-    return this.#request(
-      {
-        ...options,
-        path: path,
-        method: "PUT",
-        body: body,
-      },
-      done
+    return /** @type {Promise<T> | undefined} */ (
+      this.#request(
+        {
+          ...options,
+          path: path,
+          method: "PUT",
+          body: body,
+        },
+        done
+      )
     );
   }
 
   /**
    * API PATCH request
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {unknown} body - Request body
+   * @param {B} body - Request body
    * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   patch(path, body, options = {}, done) {
-    return this.#request(
-      {
-        ...options,
-        path: path,
-        method: "PATCH",
-        body: body,
-      },
-      done
+    return /** @type {Promise<T> | undefined} */ (
+      this.#request(
+        {
+          ...options,
+          path: path,
+          method: "PATCH",
+          body: body,
+        },
+        done
+      )
     );
   }
 
   /**
    * API DELETE request
+   * @template T
    * @param {string} path - Request path
    * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackAny | undefined} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {import("./index.js").CallbackFunction<T> | undefined} done
+   * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
   delete(path, options = {}, done) {
-    return this.#request(
-      {
-        ...options,
-        path: path,
-        method: "DELETE",
-      },
-      done
+    return /** @type {Promise<T> | undefined} */ (
+      this.#request(
+        {
+          ...options,
+          path: path,
+          method: "DELETE",
+        },
+        done
+      )
     );
   }
 }

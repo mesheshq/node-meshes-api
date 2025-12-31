@@ -129,74 +129,151 @@ export declare class MeshesApiClient {
 
   /**
    * Send a GET request to the Meshes API
+   * @template T
    * @param {string} path - Request path
-   * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackFunction} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {MeshesOptionalRequestOptions} [options] - Request options
+   * @returns {Promise<T>} - Request promise
    */
-  get(
+  get<T = unknown>(
     path: string,
-    options?: MeshesOptionalRequestOptions,
-    done?: CallbackFunction
-  ): Promise<unknown> | undefined;
+    options?: MeshesOptionalRequestOptions
+  ): Promise<T>;
+
+  /**
+   * Send a GET request to the Meshes API (callback form)
+   * @template T
+   * @param {string} path - Request path
+   * @param {MeshesOptionalRequestOptions | undefined} options - Request options
+   * @param {CallbackFunction<T>} done - Callback function
+   * @returns {undefined} - Undefined when a callback is provided
+   */
+  get<T = unknown>(
+    path: string,
+    options: MeshesOptionalRequestOptions | undefined,
+    done: CallbackFunction<T>
+  ): undefined;
 
   /**
    * Send a POST request to the Meshes API
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {any} body - Request body
-   * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackFunction} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions} [options] - Request options
+   * @returns {Promise<T>} - Request promise
    */
-  post(
+  post<T = unknown, B = unknown>(
     path: string,
-    body: unknown,
-    options?: MeshesOptionalRequestOptions,
-    done?: CallbackFunction
-  ): Promise<unknown> | undefined;
+    body: B,
+    options?: MeshesOptionalRequestOptions
+  ): Promise<T>;
+
+  /**
+   * Send a POST request to the Meshes API (callback form)
+   * @template T
+   * @template B
+   * @param {string} path - Request path
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions | undefined} options - Request options
+   * @param {CallbackFunction<T>} done - Callback function
+   * @returns {undefined} - Undefined when a callback is provided
+   */
+  post<T = unknown, B = unknown>(
+    path: string,
+    body: B,
+    options: MeshesOptionalRequestOptions | undefined,
+    done: CallbackFunction<T>
+  ): undefined;
 
   /**
    * Send a PUT request to the Meshes API
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {unknown} body - Request body
-   * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackFunction} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions} [options] - Request options
+   * @returns {Promise<T>} - Request promise
    */
-  put(
+  put<T = unknown, B = unknown>(
     path: string,
-    body: unknown,
-    options?: MeshesOptionalRequestOptions,
-    done?: CallbackFunction
-  ): Promise<unknown> | undefined;
+    body: B,
+    options?: MeshesOptionalRequestOptions
+  ): Promise<T>;
+
+  /**
+   * Send a PUT request to the Meshes API (callback form)
+   * @template T
+   * @template B
+   * @param {string} path - Request path
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions | undefined} options - Request options
+   * @param {CallbackFunction<T>} done - Callback function
+   * @returns {undefined} - Undefined when a callback is provided
+   */
+  put<T = unknown, B = unknown>(
+    path: string,
+    body: B,
+    options: MeshesOptionalRequestOptions | undefined,
+    done: CallbackFunction<T>
+  ): undefined;
 
   /**
    * Send a PATCH request to the Meshes API
+   * @template T
+   * @template B
    * @param {string} path - Request path
-   * @param {unknown} body - Request body
-   * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackFunction} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions} [options] - Request options
+   * @returns {Promise<T>} - Request promise
    */
-  patch(
+  patch<T = unknown, B = unknown>(
     path: string,
-    body: unknown,
-    options?: MeshesOptionalRequestOptions,
-    done?: CallbackFunction
-  ): Promise<unknown> | undefined;
+    body: B,
+    options?: MeshesOptionalRequestOptions
+  ): Promise<T>;
+
+  /**
+   * Send a PATCH request to the Meshes API (callback form)
+   * @template T
+   * @template B
+   * @param {string} path - Request path
+   * @param {B} body - Request body
+   * @param {MeshesOptionalRequestOptions | undefined} options - Request options
+   * @param {CallbackFunction<T>} done - Callback function
+   * @returns {undefined} - Undefined when a callback is provided
+   */
+  patch<T = unknown, B = unknown>(
+    path: string,
+    body: B,
+    options: MeshesOptionalRequestOptions | undefined,
+    done: CallbackFunction<T>
+  ): undefined;
 
   /**
    * Send a DELETE request to the Meshes API
+   * @template T
    * @param {string} path - Request path
-   * @param {MeshesOptionalRequestOptions} options - Request options
-   * @param {CallbackFunction} done - Callback function
-   * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+   * @param {MeshesOptionalRequestOptions} [options] - Request options
+   * @returns {Promise<T>} - Request promise
    */
-  delete(
+  delete<T = unknown>(
     path: string,
-    options?: MeshesOptionalRequestOptions,
-    done?: CallbackFunction
-  ): Promise<unknown> | undefined;
+    options?: MeshesOptionalRequestOptions
+  ): Promise<T>;
+
+  /**
+   * Send a DELETE request to the Meshes API (callback form)
+   * @template T
+   * @param {string} path - Request path
+   * @param {MeshesOptionalRequestOptions | undefined} options - Request options
+   * @param {CallbackFunction<T>} done - Callback function
+   * @returns {undefined} - Undefined when a callback is provided
+   */
+  delete<T = unknown>(
+    path: string,
+    options: MeshesOptionalRequestOptions | undefined,
+    done: CallbackFunction<T>
+  ): undefined;
 }
 
 /**
