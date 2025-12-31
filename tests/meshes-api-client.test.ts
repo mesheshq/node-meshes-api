@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
+import { webcrypto } from "node:crypto";
 import { MeshesApiError } from "../src/lib/errors";
 import MeshesApiClient from "../src";
 
@@ -82,6 +83,7 @@ describe("MeshesApiClient (management api)", () => {
   beforeEach(() => {
     vi.useFakeTimers();
     globalThis.fetch = vi.fn();
+    (globalThis as any).crypto ??= webcrypto;
   });
 
   afterEach(() => {
@@ -625,10 +627,14 @@ describe("MeshesApiClient (management api)", () => {
 
     const p = client.get("/x");
 
-    // Let async token creation + includeApiJwt resolve and `fetch()` actually be invoked
-    await Promise.resolve();
-    await Promise.resolve();
-
+    // Let async token creation + includeApiJwt resolve and `fetch()` actually be invoked; due to signing and fetch calling
+    for (
+      let i = 0;
+      i < 5 && (globalThis.fetch as any).mock.calls.length === 0;
+      i++
+    ) {
+      await Promise.resolve();
+    }
     expect(globalThis.fetch).toHaveBeenCalledTimes(1);
 
     // Now trigger the timeout abort
