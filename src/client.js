@@ -15,7 +15,7 @@
 /** @typedef {import("./index.js").MeshesRequestOptions} MeshesRequestOptions */
 /** @typedef {import("./index.js").MeshesOptionalRequestOptions} MeshesOptionalRequestOptions */
 /** @typedef {import("./index.js").CallbackFunction<any>} CallbackAny */
-/** @typedef {{ method: string, headers: Headers, body: string | null, signal?: AbortSignal }} MeshesRequestInit */
+/** @typedef {{ method: MeshesApiMethod, headers: Headers, body: string | null, signal?: AbortSignal }} MeshesRequestInit */
 
 import { MeshesApiError } from "./lib/errors.js";
 import { readBody } from "./lib/helpers.js";
@@ -213,12 +213,8 @@ export class MeshesApiClient {
    * @throws {MeshesApiError} - No Authentication Data
    */
   async #includeApiJwt(request) {
-    if (this.#accessKey && this.#secretKey) {
-      const token = await this.#createMeshesMachineToken();
-      request.headers["Authorization"] = `Bearer ${token}`;
-    } else {
-      throw new MeshesApiError("No Authentication Data");
-    }
+    const token = await this.#createMeshesMachineToken();
+    request.headers["Authorization"] = `Bearer ${token}`;
     return request;
   }
 
@@ -276,7 +272,7 @@ export class MeshesApiClient {
     }
 
     const requestPromise = new Promise((resolve, reject) => {
-      if (typeof options !== "object") {
+      if (typeof options !== "object" || options === null) {
         this.#log("Invalid Request Options", options);
         return reject(new MeshesApiError("Invalid request options", options));
       }
@@ -403,7 +399,11 @@ export class MeshesApiClient {
         })
         .catch((err) => {
           this.#error("Request Failure", err);
-          reject(new MeshesApiError("Request Failure", err));
+          reject(
+            err instanceof MeshesApiError
+              ? err
+              : new MeshesApiError("Request Failure", err)
+          );
         });
     })
       .then((result) => {
