@@ -14,52 +14,60 @@ export class MeshesApiClient {
     constructor(organizationId: string, accessKey: string, secretKey: string, options?: MeshesOptions);
     /**
      * API GET request
+     * @template T
      * @param {string} path - Request path
      * @param {MeshesOptionalRequestOptions} options - Request options
-     * @param {CallbackAny | undefined} done - Callback function
-     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     * @param {import("./index.js").CallbackFunction<T> | undefined} done
+     * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
      * @throws {MeshesApiError} - Invalid request
      */
-    get(path: string, options: MeshesOptionalRequestOptions | undefined, done: CallbackAny | undefined): Promise<unknown> | undefined;
+    get<T>(path: string, options?: MeshesOptionalRequestOptions, done?: import("./index.js").CallbackFunction<T> | undefined): Promise<T> | undefined;
     /**
      * API POST request
+     * @template T
+     * @template B
      * @param {string} path - Request path
-     * @param {unknown} body - Request body
+     * @param {B} body - Request body
      * @param {MeshesOptionalRequestOptions} options - Request options
-     * @param {CallbackAny | undefined} done - Callback function
-     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     * @param {import("./index.js").CallbackFunction<T> | undefined} done
+     * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
      * @throws {MeshesApiError} - Invalid request
      */
-    post(path: string, body: unknown, options: MeshesOptionalRequestOptions | undefined, done: CallbackAny | undefined): Promise<unknown> | undefined;
+    post<T, B>(path: string, body: B, options?: MeshesOptionalRequestOptions, done?: import("./index.js").CallbackFunction<T> | undefined): Promise<T> | undefined;
     /**
      * API PUT request
+     * @template T
+     * @template B
      * @param {string} path - Request path
-     * @param {unknown} body - Request body
+     * @param {B} body - Request body
      * @param {MeshesOptionalRequestOptions} options - Request options
-     * @param {CallbackAny | undefined} done - Callback function
-     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     * @param {import("./index.js").CallbackFunction<T> | undefined} done
+     * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
      * @throws {MeshesApiError} - Invalid request
      */
-    put(path: string, body: unknown, options: MeshesOptionalRequestOptions | undefined, done: CallbackAny | undefined): Promise<unknown> | undefined;
+    put<T, B>(path: string, body: B, options?: MeshesOptionalRequestOptions, done?: import("./index.js").CallbackFunction<T> | undefined): Promise<T> | undefined;
     /**
      * API PATCH request
+     * @template T
+     * @template B
      * @param {string} path - Request path
-     * @param {unknown} body - Request body
+     * @param {B} body - Request body
      * @param {MeshesOptionalRequestOptions} options - Request options
-     * @param {CallbackAny | undefined} done - Callback function
-     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     * @param {import("./index.js").CallbackFunction<T> | undefined} done
+     * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
      * @throws {MeshesApiError} - Invalid request
      */
-    patch(path: string, body: unknown, options: MeshesOptionalRequestOptions | undefined, done: CallbackAny | undefined): Promise<unknown> | undefined;
+    patch<T, B>(path: string, body: B, options?: MeshesOptionalRequestOptions, done?: import("./index.js").CallbackFunction<T> | undefined): Promise<T> | undefined;
     /**
      * API DELETE request
+     * @template T
      * @param {string} path - Request path
      * @param {MeshesOptionalRequestOptions} options - Request options
-     * @param {CallbackAny | undefined} done - Callback function
-     * @returns {Promise<unknown> | undefined} - Request promise or undefined if a callback is provided
+     * @param {import("./index.js").CallbackFunction<T> | undefined} done
+     * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
      * @throws {MeshesApiError} - Invalid request
      */
-    delete(path: string, options: MeshesOptionalRequestOptions | undefined, done: CallbackAny | undefined): Promise<unknown> | undefined;
+    delete<T>(path: string, options?: MeshesOptionalRequestOptions, done?: import("./index.js").CallbackFunction<T> | undefined): Promise<T> | undefined;
     #private;
 }
 export default MeshesApiClient;
@@ -69,9 +77,8 @@ export type MeshesOptions = import("./index.js").MeshesOptions;
 export type MeshesApiMethod = import("./index.js").MeshesApiMethod;
 export type MeshesRequestOptions = import("./index.js").MeshesRequestOptions;
 export type MeshesOptionalRequestOptions = import("./index.js").MeshesOptionalRequestOptions;
-export type CallbackAny = import("./index.js").CallbackFunction<any>;
 export type MeshesRequestInit = {
-    method: string;
+    method: MeshesApiMethod;
     headers: Headers;
     body: string | null;
     signal?: AbortSignal;

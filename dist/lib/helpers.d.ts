@@ -1,1 +1,6 @@
-export function readBody(response: any): Promise<unknown | string | null>;
+export function readBody<T>(response: {
+    text(): Promise<string>;
+    headers?: {
+        get(name: string): string | null;
+    };
+}): Promise<T | string | null>;
