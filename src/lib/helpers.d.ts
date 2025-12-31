@@ -1,3 +1,4 @@
-export function readBody(response: {
+export function readBody<T = unknown>(response: {
   text(): Promise<string>;
-}): Promise<unknown | string | null>;
+  headers?: { get(name: string): string | null };
+}): Promise<T | string | null>;

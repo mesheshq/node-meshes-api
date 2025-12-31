@@ -1,7 +1,8 @@
 /**
  * Helper to read the response body and parse as a json object; if json parsing fails, fallback to text
- * @param {any} response
- * @return {Promise<unknown | string | null>}
+ * @template T
+ * @param {{ text(): Promise<string>, headers?: { get(name: string): string | null } }} response
+ * @returns {Promise<T | string | null>}
  */
 export const readBody = async (response) => {
   const text = await response.text();

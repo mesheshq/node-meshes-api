@@ -369,7 +369,7 @@ export class MeshesApiClient {
             readBody(response)
               .then((data) => {
                 this.#log("Response Success");
-                resolve(data);
+                resolve(/** @type {T} */ (data));
               })
               .catch((err) => {
                 this.#error("Response Parsing Error", err);
@@ -452,7 +452,7 @@ export class MeshesApiClient {
    * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
-  get(path, options = {}, done) {
+  get(path, options = {}, done = undefined) {
     return /** @type {Promise<T> | undefined} */ (
       this.#request(
         {
@@ -476,7 +476,7 @@ export class MeshesApiClient {
    * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
-  post(path, body, options = {}, done) {
+  post(path, body, options = {}, done = undefined) {
     return /** @type {Promise<T> | undefined} */ (
       this.#request(
         {
@@ -501,7 +501,7 @@ export class MeshesApiClient {
    * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
-  put(path, body, options = {}, done) {
+  put(path, body, options = {}, done = undefined) {
     return /** @type {Promise<T> | undefined} */ (
       this.#request(
         {
@@ -526,7 +526,7 @@ export class MeshesApiClient {
    * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
-  patch(path, body, options = {}, done) {
+  patch(path, body, options = {}, done = undefined) {
     return /** @type {Promise<T> | undefined} */ (
       this.#request(
         {
@@ -549,7 +549,7 @@ export class MeshesApiClient {
    * @returns {Promise<T> | undefined} - Request promise or undefined if a callback is provided
    * @throws {MeshesApiError} - Invalid request
    */
-  delete(path, options = {}, done) {
+  delete(path, options = {}, done = undefined) {
     return /** @type {Promise<T> | undefined} */ (
       this.#request(
         {
