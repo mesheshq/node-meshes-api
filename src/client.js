@@ -26,9 +26,12 @@ const MAX_TIMEOUT_MS = 30000;
 const forbiddenHeaders = new Set([
   "accept",
   "authorization",
+  "connection",
   "content-length",
   "content-type",
   "host",
+  "user-agent",
+  "transfer-encoding",
   "x-amz-date",
   "x-api-key",
   "x-amz-security-token",
@@ -79,7 +82,7 @@ export class MeshesApiClient {
   constructor(organizationId, accessKey, secretKey, options = {}) {
     const regex = {
       organizationId:
-        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i,
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i,
       accessKey: /^mk_[A-Za-z0-9_-]+$/,
       secretKey: /^[A-Za-z0-9_-]{43,}$/,
     };
@@ -273,54 +276,54 @@ export class MeshesApiClient {
     }
 
     const requestPromise = new Promise((resolve, reject) => {
-      if (typeof options !== "object") {
-        this.#log("Invalid Request Options", options);
-        throw new MeshesApiError("Invalid request options", options);
-      }
-      const method = /** @type {MeshesApiMethod | undefined} */ (
-        options?.method?.toUpperCase()
-      );
-      if (!method || typeof method !== "string") {
-        this.#log("Invalid Request Method", options);
-        throw new MeshesApiError("Invalid request method", options);
-      } else if (!validMethods.includes(method)) {
-        this.#log("Invalid Request Method Option", options);
-        throw new MeshesApiError("Unsupported request method", options);
-      }
-
-      if (
-        !options?.path ||
-        typeof options.path !== "string" ||
-        options.path.trim().length === 0 ||
-        options.path.trim() === "/"
-      ) {
-        this.#log("Invalid Request Path", options);
-        throw new MeshesApiError("Invalid request path", options);
-      }
-
-      if (typeof options?.timeout !== "undefined") {
-        if (typeof options.timeout !== "number") {
-          this.#log("Invalid Request Timeout", options);
-          throw new MeshesApiError("Invalid request timeout", options);
-        }
-        if (options.timeout < 1000 || options.timeout > MAX_TIMEOUT_MS) {
-          this.#log("Unsupported Request Timeout", options);
-          throw new MeshesApiError("Unsupported request timeout", options);
-        }
-      }
-
-      if (typeof options.query !== "undefined") {
-        if (
-          !options.query ||
-          typeof options.query !== "object" ||
-          Array.isArray(options.query)
-        ) {
-          this.#log("Invalid Request Query Params", options);
-          throw new MeshesApiError("Invalid request query params", options);
-        }
-      }
-
       try {
+        if (typeof options !== "object") {
+          this.#log("Invalid Request Options", options);
+          throw new MeshesApiError("Invalid request options", options);
+        }
+        const method = /** @type {MeshesApiMethod | undefined} */ (
+          options?.method?.toUpperCase()
+        );
+        if (!method || typeof method !== "string") {
+          this.#log("Invalid Request Method", options);
+          throw new MeshesApiError("Invalid request method", options);
+        } else if (!validMethods.includes(method)) {
+          this.#log("Invalid Request Method Option", options);
+          throw new MeshesApiError("Unsupported request method", options);
+        }
+
+        if (
+          !options?.path ||
+          typeof options.path !== "string" ||
+          options.path.trim().length === 0 ||
+          options.path.trim() === "/"
+        ) {
+          this.#log("Invalid Request Path", options);
+          throw new MeshesApiError("Invalid request path", options);
+        }
+
+        if (typeof options?.timeout !== "undefined") {
+          if (typeof options.timeout !== "number") {
+            this.#log("Invalid Request Timeout", options);
+            throw new MeshesApiError("Invalid request timeout", options);
+          }
+          if (options.timeout < 1000 || options.timeout > MAX_TIMEOUT_MS) {
+            this.#log("Unsupported Request Timeout", options);
+            throw new MeshesApiError("Unsupported request timeout", options);
+          }
+        }
+
+        if (typeof options.query !== "undefined") {
+          if (
+            !options.query ||
+            typeof options.query !== "object" ||
+            Array.isArray(options.query)
+          ) {
+            this.#log("Invalid Request Query Params", options);
+            throw new MeshesApiError("Invalid request query params", options);
+          }
+        }
+
         const queryString = options.query
           ? `?${new URLSearchParams(
               Object.entries(options.query).reduce((acc, [k, v]) => {
@@ -401,8 +404,11 @@ export class MeshesApiClient {
           });
       } catch (err) {
         this.#error("Unexpected Error", err);
+        if (err instanceof MeshesApiError) {
+          reject(err);
+          return;
+        }
         reject(new MeshesApiError("Unexpected Error", err));
-        throw err;
       }
     })
       .then((result) => {
