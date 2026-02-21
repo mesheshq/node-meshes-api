@@ -4,10 +4,11 @@
 [![NPM Version][npm-version-image]][npm-url]
 [![NPM Install Size][npm-install-size-image]][npm-install-size-url]
 
-A minimal JavaScript client for calling **Meshes Management APIs** using an **organization id**, **access key**, and **secret key**.
+A minimal JavaScript/TypeScript client for calling **Meshes Management APIs** using an **organization id**, **access key**, and **secret key**.
 
 This package is designed to be tiny and predictable:
 
+- **Full TypeScript support** with bundled type definitions
 - Supports **Promise**, **async/await**, and **callback** styles
 - Works with both **ESM** and **CommonJS**
 - Automatically signs a short-lived **machine token (JWT)** and sends it as a `Bearer` token
@@ -15,8 +16,6 @@ This package is designed to be tiny and predictable:
 - Optional timeout support using `AbortController` when available
 
 See the [API Docs](https://meshes.io/docs) for more details about the API methods.
-
----
 
 ## Installation
 
@@ -28,8 +27,6 @@ pnpm add @mesheshq/api
 yarn add @mesheshq/api
 ```
 
----
-
 ## Quick Start
 
 The package exports:
@@ -37,7 +34,7 @@ The package exports:
 - `MeshesApiClient` (default export + named export)
 - `MeshesApiError`
 
-```js
+```ts
 // CommonJS
 // const { MeshesApiClient } = require("@mesheshq/api");
 
@@ -73,7 +70,7 @@ try {
 
 If you provide a callback, the method returns `undefined` and invokes the callback when complete.
 
-```js
+```ts
 client.get("/workspaces", {}, function (err, result) {
   if (err) {
     // error handling
@@ -83,13 +80,29 @@ client.get("/workspaces", {}, function (err, result) {
 });
 ```
 
----
+## TypeScript
+
+This package ships with bundled type definitions — no need to install separate `@types` packages.
+
+```ts
+import MeshesApiClient, { MeshesApiError } from "@mesheshq/api";
+
+const client = new MeshesApiClient(
+  process.env.MESHES_ORGANIZATION_ID!,
+  process.env.MESHES_ACCESS_KEY!,
+  process.env.MESHES_SECRET_KEY!
+);
+
+const workspaces = await client.get("/workspaces");
+```
+
+If you're using plain JavaScript, the types will still power autocomplete and inline docs in editors like VS Code.
 
 ## Credentials
 
 ### Organization ID
 
-`organizationId` is a UUID that identifies your Meshes account organization.  This can be found in the main account settings.
+`organizationId` is a UUID that identifies your Meshes account organization. This can be found in the main account settings.
 
 Example:
 
@@ -121,13 +134,11 @@ b6YH5cKJ9m3sYt... (long string)
 
 If any credential is missing or invalid, the client throws a `MeshesApiError` immediately during construction.
 
----
-
 ## Usage
 
 ### Initialization
 
-```js
+```ts
 import MeshesApiClient from "@mesheshq/api";
 
 const client = new MeshesApiClient(
@@ -152,7 +163,7 @@ const client = new MeshesApiClient(
 
 ### GET
 
-```js
+```ts
 const me = await client.get("/workspaces");
 ```
 
@@ -163,7 +174,7 @@ Bodies are serialized automatically:
 - objects → `JSON.stringify(body)`
 - strings → sent as-is
 
-```js
+```ts
 const created = await client.post("/resources", { name: "My Resource" });
 
 const updated = await client.put("/resources/123", { name: "Renamed" });
@@ -173,17 +184,15 @@ await client.patch("/resources/123", { enabled: true });
 
 ### DELETE
 
-```js
+```ts
 await client.delete("/resources/123");
 ```
-
----
 
 ## Request Options
 
 All request methods accept an optional `options` object:
 
-```js
+```ts
 await client.get("/resources", {
   // Add request-specific headers
   headers: {
@@ -206,8 +215,6 @@ await client.get("/resources", {
 
 `query` values may be strings, numbers, or booleans. They will be stringified and appended to the URL.
 
----
-
 ## Protected / Forbidden Headers
 
 To keep the API contract consistent, the following headers cannot be overridden via **constructor** `options.headers`
@@ -218,15 +225,13 @@ and will cause a `MeshesApiError`:
 - `Content-Type`
 - `Accept`
 
-If you pass these in **per-request** `options.headers`, they are silently dropped (and the client’s contract headers remain in effect).
-
----
+If you pass these in **per-request** `options.headers`, they are silently dropped (and the client's contract headers remain in effect).
 
 ## Errors
 
 All client errors are thrown as `MeshesApiError`.
 
-```js
+```ts
 import MeshesApiClient, { MeshesApiError } from "@mesheshq/api";
 
 try {
@@ -250,15 +255,13 @@ try {
 
 If the Meshes API returns a non-2xx response, the client throws `MeshesApiError` and includes:
 
-```js
+```ts
 err.data = {
   status: 401,
   statusText: "Unauthorized",
   data: { ...parsedResponseBodyOrText },
 };
 ```
-
----
 
 ## Response Body Parsing
 
@@ -268,8 +271,6 @@ Responses are parsed as:
 - otherwise plain text
 - `null` if the response body is empty
 
----
-
 ## Timeouts and AbortController
 
 Timeout support uses `AbortController` when available (modern Node versions have it globally).  
@@ -277,33 +278,20 @@ If `AbortController` is not available, requests still work, but timeouts cannot 
 
 Timeout range: **1000ms** to **30000ms**.
 
----
-
 ## Node / Runtime Notes
 
-This client uses `fetch`. Ensure your runtime provides a global `fetch`:
+This client uses `fetch` and `WebCrypto` (for JWT signing). Ensure your runtime provides both:
 
-- Node 18+ has global `fetch`
-- For Node 16/17 you may need a polyfill (e.g. `undici`) or run in an environment that provides it
+- **Node 18+** has global `fetch` and `WebCrypto` — no setup needed
+- **Node 16/17** may require polyfills for both `fetch` (e.g. `undici`) and `WebCrypto` (`globalThis.crypto ??= require('node:crypto').webcrypto`)
 
-### WebCrypto / jose (Node 16/17)
-
-If you run on Node 16/17 and see errors related to WebCrypto, you may need to provide `globalThis.crypto`:
-
-```js
-import { webcrypto } from "node:crypto";
-globalThis.crypto ??= webcrypto;
-```
-
-Node 18+ already includes WebCrypto globally.
-
----
+Node 18+ is recommended.
 
 ## License
 
 MIT
 
-[npm-install-size-image]: https://badgen.net/packagephobia/publish/@mesheshq/api?cache=250&v1.0.1
+[npm-install-size-image]: https://badgen.net/packagephobia/publish/@mesheshq/api?cache=200
 [npm-install-size-url]: https://packagephobia.com/result?p=%40mesheshq%2Fapi
 [npm-url]: https://www.npmjs.com/package/@mesheshq/api
-[npm-version-image]: https://badgen.net/npm/v/@mesheshq/api?cache=250&v1.0.1
+[npm-version-image]: https://badgen.net/npm/v/@mesheshq/api?cache=200
