@@ -18,7 +18,7 @@ jobs:
     environment: production
     steps:
       - name: Checkout main
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           # Use release tag when release event; else use input ref
@@ -43,7 +43,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout main
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           ref: ${{ github.event.release.tag_name || inputs.ref }}
